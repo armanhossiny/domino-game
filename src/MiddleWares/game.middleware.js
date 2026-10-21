@@ -77,6 +77,7 @@ async function ensureGameNotFinished(payload) {
   const { game, playerId, player } = payload;
 
   if (game.state.settlementPending) throw new ValidationError("MATCH_SETTLEMENT_PENDING");
+  if (game.state.admissionPending) throw new ValidationError("MATCH_ADMISSION_PENDING");
 
   if (!game.state.isEnded) {
     return;

@@ -172,6 +172,13 @@ async function reJoinGame(payload) {
     return;
   }
 
+  if (game.state.admissionPending && !await require("./AdmissionActivation")(game)) {
+    await Network.SendByPlayerId(playerId, {
+      method: Strings.MT_GAME_NOT_VALID,
+      payload: { gameId, message: Strings.S_GAME_NOT_VALID, reason: "ADMISSION_REFUNDED" }
+    });
+    return;
+  }
   const isPlayerInGame =
     (game &&
       !game.state.isEnded &&
@@ -526,6 +533,10 @@ async function onOnlineState(payload) {
 
 async function tick(payload) {
   const { gameId, MaxTick, game } = payload;
+  if (game.state.admissionPending) {
+    await require("./AdmissionActivation")(game);
+    return;
+  }
 
   if (game.state.settlementPending) {
     // Automatic replay is only safe with Parse's atomic settlement enabled.
