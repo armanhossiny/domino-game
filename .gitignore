@@ -1,0 +1,9 @@
+﻿.idea
+*.7z
+node_modules
+.vs
+/.env
+Log/*
+qodana.yaml
+games
+package-lock.json

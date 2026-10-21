@@ -1,0 +1,8 @@
+
+const Conductor = {
+  run(command, payload, game) {
+    return command.execute(payload, game);
+  },
+};
+
+module.exports = Conductor;
