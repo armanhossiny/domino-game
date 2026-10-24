@@ -4,7 +4,6 @@
   "description": "Game core server",
   "main": "app.js",
   "scripts": {
-    "test": "node --test tests/*.test.cjs",
     "dev": "node --watch --env-file=.env app.js",
     "inspect": "node --inspect app.js",
     "lint": "npx eslint . --fix",

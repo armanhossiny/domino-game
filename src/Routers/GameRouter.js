@@ -14,7 +14,7 @@ const {
 Router.handle("tick", [needGameExist], GameHandler.tick);
 Router.handle(
   "joinGame",
-  [needPlayerExist, needGameExist, isPlayerInGame, ensureGameNotFinished],
+  [needPlayerExist, needGameExist, isPlayerInGame],
   GameHandler.joinGame
 );
 Router.handle(
@@ -22,15 +22,15 @@ Router.handle(
   [needPlayerExist, needGameExist, isPlayerInGame],
   GameHandler.reJoinGame
 );
-Router.handle("move_leave_player", [needGameExist, ensureGameNotFinished], GameHandler.onMove);
+Router.handle("move_leave_player", [needGameExist], GameHandler.onMove);
 
 Router.handle(
   "pickup_leave_player",
-  [needGameExist, ensureGameNotFinished],
+  [needGameExist],
   GameHandler.pickUpBankTurn
 );
 
-Router.handle("turnPass_leave_player", [needGameExist, ensureGameNotFinished], GameHandler.onTurnPass);
+Router.handle("turnPass_leave_player", [needGameExist], GameHandler.onTurnPass);
 
 [
   ["pickup", GameHandler.onPickUp],

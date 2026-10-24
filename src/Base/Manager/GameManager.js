@@ -20,34 +20,6 @@ async function addId(gameId) {
   return true;
 }
 
-async function finalizeAdmission(gameId, objectId, refunded) {
-  const key = `${ALL_GAMES}:${gameId}`;
-  for (let attempt = 0; attempt < 5; attempt++) {
-    const raw = await redisUtils.get(key);
-    if (!raw) throw Error("ACTIVATION_GAME_STATE_MISSING");
-    const current = JSON.parse(raw);
-    if (current.objectId !== objectId) throw Error("ACTIVATION_GAME_ID_CONFLICT");
-    if (!current.state.admissionPending || current.state.admissionRefunded) {
-      if (!current.state.isEnded) await Core.addGame(gameId);
-      return ruleFactory(current);
-    }
-    current.state.admissionPending = refunded;
-    if (refunded) {
-      current.state.isEnded = true;
-      current.state.admissionRefunded = true;
-    }
-    // CAS preserves a newer board when an activation response arrives late.
-    const changed = await redisUtils.eval(
-      "if redis.call('GET',KEYS[1]) ~= ARGV[1] then return 0 end redis.call('SET',KEYS[1],ARGV[2],'EX',ARGV[3]); return 1",
-      { keys: [key], arguments: [raw, JSON.stringify(current), String(GAME_MAX_EX_TIME)] });
-    if (!changed) continue;
-    if (refunded) await Core.removeGame(gameId);
-    else await Core.addGame(gameId);
-    return ruleFactory(current);
-  }
-  throw Error("ACTIVATION_STATE_BUSY");
-}
-
 async function set(where, gameId, game) {
   if (game) {
     if (gameId && Object.keys(game).length) {
@@ -95,7 +67,6 @@ async function all() {
 }
 
 module.exports = {
-  finalizeAdmission,
   add,
   addId,
   set,

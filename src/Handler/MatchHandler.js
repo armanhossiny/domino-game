@@ -746,8 +746,7 @@ async function onMatchStart(match, gameTableInfo) {
       friendly: game.friendly,
       tournament: game.tournament,
       gameId: game.gameId,
-      admissionId: match.matchId,
-      activationProtocol: 1
+      admissionId: match.matchId
     };
 
     const result = await joinMatchParse(dataToSend);
@@ -774,11 +773,7 @@ async function onMatchStart(match, gameTableInfo) {
 
     // await payGameEntryFee(game, coin_entry, key);
 
-    if (result.activationRequired) {
-      game.state.admissionPending = true;
-      await GameManager.set("admission-before-activation", gameId, game);
-      if (!await require("./AdmissionActivation")(game)) return;
-    } else await GameManager.add(gameId, game);
+    await GameManager.add(gameId, game);
 
     await Conductor.run(new InitGameCommand(match), {
       gameId,
@@ -788,7 +783,7 @@ async function onMatchStart(match, gameTableInfo) {
       tournament
     });
 
-    if (!result.activationRequired) await GameManager.set("GameHandler-createNewGame", gameId, game);
+    await GameManager.set("GameHandler-createNewGame", gameId, game);
   } catch (error) {
     logger.error(error);
   }
